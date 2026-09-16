@@ -25,8 +25,7 @@ import { Streamdown } from "streamdown";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { toolFormulaDefaults } from "@/lib/site-data";
-import { tools } from "@/lib/site-data";
+import { toolFormulaDefaults, tools } from "@/lib/site-data";
 
 type ContentKind = "article" | "guide" | "report" | "area" | "tool";
 type ContentStatus = "draft" | "published" | "unpublished" | "archived";
@@ -239,7 +238,7 @@ export default function AdminCMS() {
         </div>
         <p className="eyebrow text-ink/40">CMS workspace</p>
         <div className="mt-3 grid gap-1">
-          {sections.map(item => {
+          {sections.map((item: any) => {
             const Icon = item.icon;
             return (
               <button
@@ -329,7 +328,59 @@ export default function AdminCMS() {
 
 function Overview({ analytics, loading }: { analytics?: { subscribers: number; content: Record<string, { total: number; published: number; draft: number }>; recent: { id: number; title: string; kind: string; status: string; updatedAt: Date }[] }; loading: boolean }) {
   const groups = [["Articles", "article"], ["Guides", "guide"]] as const;
-  return <><div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{groups.map(([label, key]) => <MetricGroup key={key} label={label} values={analytics?.content[key]} loading={loading} />)}<div className="admin-card"><div className="flex items-center justify-between"><p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">Free tools</p><SlidersHorizontal size={16} className="text-coral" /></div><p className="font-display mt-4 text-[38px] font-semibold">{tools.length}</p><div className="mt-4 border-t border-ink/10 pt-3 text-xs text-ink/50">Configured public calculators</div></div></div><div className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_.8fr]"><div className="admin-card"><div className="flex items-center justify-between"><div><p className="eyebrow">Publishing activity</p><h2 className="font-display mt-2 text-[27px] font-semibold">Recent content changes</h2></div><span className="admin-health"><Activity size={14} /> Live data</span></div><div className="mt-6 grid gap-3">{analytics?.recent.map(item => <div className="flex items-center justify-between gap-4 border-b border-ink/10 pb-3 last:border-0" key={item.id}><div className="min-w-0"><p className="truncate text-sm font-semibold">{item.title}</p><p className="mt-1 text-xs text-ink/45">{item.kind} · {new Date(item.updatedAt).toLocaleDateString()}</p></div><span className="badge badge-green">{item.status}</span></div>)}</div></div><div className="admin-card"><div className="flex items-center justify-between"><div><p className="eyebrow">Audience</p><h2 className="font-display mt-2 text-[27px] font-semibold">Subscribers</h2></div><span className="font-display text-[34px] font-semibold">{analytics?.subscribers ?? 0}</span></div><p className="mt-6 text-sm leading-6 text-ink/55">Active readers subscribed to new articles, guides and reports.</p><div className="mt-6 h-2 overflow-hidden rounded-full bg-sand"><div className="h-full w-[72%] rounded-full bg-coral" /></div><p className="mt-2 text-xs text-ink/45">Audience health</p></div></div></>;
+  return (
+    <>
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {groups.map(([label, key]) => (
+          <MetricGroup key={key} label={label} values={analytics?.content[key]} loading={loading} />
+        ))}
+        <div className="admin-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">Free tools</p>
+            <SlidersHorizontal size={16} className="text-coral" />
+          </div>
+          <p className="font-display mt-4 text-[38px] font-semibold">{tools.length}</p>
+          <div className="mt-4 border-t border-ink/10 pt-3 text-xs text-ink/50">Configured public calculators</div>
+        </div>
+      </div>
+      <div className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="admin-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="eyebrow">Publishing activity</p>
+              <h2 className="font-display mt-2 text-[27px] font-semibold">Recent content changes</h2>
+            </div>
+            <span className="admin-health"><Activity size={14} /> Live data</span>
+          </div>
+          <div className="mt-6 grid gap-3">
+            {analytics?.recent.map((item: any) => (
+              <div className="flex items-center justify-between gap-4 border-b border-ink/10 pb-3 last:border-0" key={item.id}>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{item.title}</p>
+                  <p className="mt-1 text-xs text-ink/45">{item.kind} · {new Date(item.updatedAt).toLocaleDateString()}</p>
+                </div>
+                <span className="badge badge-green">{item.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="admin-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="eyebrow">Audience</p>
+              <h2 className="font-display mt-2 text-[27px] font-semibold">Subscribers</h2>
+            </div>
+            <span className="font-display text-[34px] font-semibold">{analytics?.subscribers ?? 0}</span>
+          </div>
+          <p className="mt-6 text-sm leading-6 text-ink/55">Active readers subscribed to new articles, guides and reports.</p>
+          <div className="mt-6 h-2 overflow-hidden rounded-full bg-sand">
+            <div className="h-full w-[72%] rounded-full bg-coral" />
+          </div>
+          <p className="mt-2 text-xs text-ink/45">Audience health</p>
+        </div>
+      </div>
+    </>
+  );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -576,8 +627,46 @@ function ToolSettingsPanel() {
   const save = trpc.admin.saveToolSetting.useMutation({ onSuccess: () => void utils.admin.toolSettings.invalidate() });
   const [drafts, setDrafts] = useState<Record<number, string>>({});
   const configured = new Map((settings.data ?? []).map((item: any) => [`${item.toolSlug}:${item.key}`, item]));
-  const rows = [...toolFormulaDefaults.map(item => ({ ...item, saved: configured.get(`${item.toolSlug}:${item.key}`) })), ...(settings.data ?? []).filter((item: any) => !toolFormulaDefaults.some(defaultItem => defaultItem.toolSlug === item.toolSlug && defaultItem.key === item.key)).map((item: any) => ({ ...item, saved: item }))];
-  return <div className="mt-10 grid gap-5"><div className="admin-card"><p className="eyebrow">Calculator formulas</p><h2 className="font-display mt-2 text-[28px] font-semibold">Change assumptions without a code deploy.</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">These values are used by the public calculators. Save a value here when rates, periods or business rules change. Add a new key in the database later for another configurable assumption.</p></div>{rows.map((item: any) => { const id = item.saved?.id ?? `${item.toolSlug}-${item.key}`; const value = drafts[item.saved?.id ?? 0] ?? item.saved?.value ?? item.value; return <div className="admin-card grid gap-3 md:grid-cols-[1fr_220px_auto] md:items-end" key={id}><div><p className="eyebrow">{item.toolSlug}</p><h2 className="font-display mt-1 text-xl font-semibold">{item.label}</h2><p className="mt-1 text-xs text-ink/50">{item.description || item.key}</p></div><input className="form-input" inputMode="decimal" value={value} onChange={event => setDrafts({ ...drafts, [item.saved?.id ?? 0]: event.target.value })} /><button className="button button-dark" onClick={() => save.mutate({ toolSlug: item.toolSlug, key: item.key, label: item.label, value, type: item.type, description: item.description ?? undefined })}><Check size={15} /> Save</button></div>; })}</div>;
+  const rows = [
+    ...toolFormulaDefaults.map(item => ({ ...item, saved: configured.get(`${item.toolSlug}:${item.key}`) })),
+    ...(settings.data ?? []).filter((item: any) => !toolFormulaDefaults.some((defaultItem: any) => defaultItem.toolSlug === item.toolSlug && defaultItem.key === item.key)).map((item: any) => ({ ...item, saved: item }))
+  ];
+  return (
+    <div className="mt-10 grid gap-5">
+      <div className="admin-card">
+        <p className="eyebrow">Calculator formulas</p>
+        <h2 className="font-display mt-2 text-[28px] font-semibold">Change assumptions without a code deploy.</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">
+          These values are used by the public calculators. Save a value here when rates, periods or business rules change. Add a new key in the database later for another configurable assumption.
+        </p>
+      </div>
+      {rows.map((item: any) => {
+        const id = item.saved?.id ?? `${item.toolSlug}-${item.key}`;
+        const value = drafts[item.saved?.id ?? 0] ?? item.saved?.value ?? item.value;
+        return (
+          <div className="admin-card grid gap-3 md:grid-cols-[1fr_220px_auto] md:items-end" key={id}>
+            <div>
+              <p className="eyebrow">{item.toolSlug}</p>
+              <h2 className="font-display mt-1 text-xl font-semibold">{item.label}</h2>
+              <p className="mt-1 text-xs text-ink/50">{item.description || item.key}</p>
+            </div>
+            <input
+              className="form-input"
+              inputMode="decimal"
+              value={value}
+              onChange={event => setDrafts({ ...drafts, [item.saved?.id ?? 0]: event.target.value })}
+            />
+            <button
+              className="button button-dark"
+              onClick={() => save.mutate({ toolSlug: item.toolSlug, key: item.key, label: item.label, value, type: item.type, description: item.description ?? undefined })}
+            >
+              <Check size={15} /> Save
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function ReportsPanel() {
@@ -587,18 +676,107 @@ function ReportsPanel() {
     ["Average gross yield", "5.2%", "+0.4 pts"],
     ["Active inventory", "12,480", "-3.1%"],
   ];
-  return <div className="mt-10 grid gap-5"><div className="admin-card"><p className="eyebrow">Read-only research section</p><h2 className="font-display mt-2 text-[28px] font-semibold">Statistics shown on the public reports page.</h2><p className="mt-3 text-sm leading-6 text-ink/55">Reports are intentionally not managed as blog posts. Keep this section focused on the indicators readers use to understand the market.</p></div><div className="grid gap-4 sm:grid-cols-2">{statistics.map(([label, value, change]) => <div className="admin-card" key={label}><p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">{label}</p><p className="font-display mt-4 text-[34px] font-semibold">{value}</p><p className="mt-2 text-sm font-semibold text-coral">{change}</p></div>)}</div></div>;
+  return (
+    <div className="mt-10 grid gap-5">
+      <div className="admin-card">
+        <p className="eyebrow">Read-only research section</p>
+        <h2 className="font-display mt-2 text-[28px] font-semibold">Statistics shown on the public reports page.</h2>
+        <p className="mt-3 text-sm leading-6 text-ink/55">
+          Reports are intentionally not managed as blog posts. Keep this section focused on the indicators readers use to understand the market.
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {statistics.map(([label, value, change]) => (
+          <div className="admin-card" key={label}>
+            <p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">{label}</p>
+            <p className="font-display mt-4 text-[34px] font-semibold">{value}</p>
+            <p className="mt-2 text-sm font-semibold text-coral">{change}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-function MetricGroup({ label, values, loading }: { label: string; values?: { total: number; published: number; draft: number }; loading: boolean }) { return <div className="admin-card"><div className="flex items-center justify-between"><p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">{label}</p><FileText size={16} className="text-coral" /></div>{loading ? <div className="mt-5 h-10 w-20 animate-pulse rounded bg-sand" /> : <p className="font-display mt-4 text-[38px] font-semibold">{values?.total ?? 0}</p>}<div className="mt-4 flex gap-4 border-t border-ink/10 pt-3 text-xs"><span className="text-emerald-700">{values?.published ?? 0} published</span><span className="text-ink/50">{values?.draft ?? 0} drafts</span></div></div>; }
+function MetricGroup({ label, values, loading }: { label: string; values?: { total: number; published: number; draft: number }; loading: boolean }) {
+  return (
+    <div className="admin-card">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-[.12em] text-ink/45">{label}</p>
+        <FileText size={16} className="text-coral" />
+      </div>
+      {loading ? (
+        <div className="mt-5 h-10 w-20 animate-pulse rounded bg-sand" />
+      ) : (
+        <p className="font-display mt-4 text-[38px] font-semibold">{values?.total ?? 0}</p>
+      )}
+      <div className="mt-4 flex gap-4 border-t border-ink/10 pt-3 text-xs">
+        <span className="text-emerald-700">{values?.published ?? 0} published</span>
+        <span className="text-ink/50">{values?.draft ?? 0} drafts</span>
+      </div>
+    </div>
+  );
+}
 
 function ContentTable({ items, onEdit, onStatus, onDelete }: { items: any[]; onEdit: (item: any) => void; onStatus: (id: number, status: ContentStatus) => void; onDelete: (id: number) => void }) {
-  if (!items.length) return <div className="empty-state mt-10"><FileText size={24} className="mx-auto" /><p className="mt-3 font-semibold">Nothing here yet.</p><p className="mt-1 text-sm">Create the first item using the button above.</p></div>;
-  return <div className="mt-10 grid gap-3">{items.map((item: any) => <article key={item.id} className="admin-card flex flex-col gap-4 md:flex-row md:items-center md:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="badge badge-green">{item.status}</span><span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">{item.kind}</span></div><h2 className="font-display mt-2 truncate text-[23px] font-semibold">{item.title}</h2><p className="mt-1 text-xs text-ink/45">/{item.slug} · Updated {new Date(item.updatedAt).toLocaleDateString()}</p></div><div className="flex shrink-0 flex-wrap gap-2"><button className="button button-outline" onClick={() => onEdit(item)}><Edit3 size={14} /> Edit</button>{item.status === "published" ? <button className="button button-outline" onClick={() => onStatus(item.id, "unpublished")}>Unpublish</button> : item.status === "archived" ? <button className="button button-dark" onClick={() => onStatus(item.id, "draft")}><RefreshCw size={14} /> Restore draft</button> : <button className="button button-dark" onClick={() => onStatus(item.id, "published")}><Check size={14} /> Publish</button>}{item.status !== "archived" && <button className="button button-outline" onClick={() => onStatus(item.id, "archived")}>Archive</button>}<button className="icon-button text-red-700" aria-label="Delete content" onClick={() => onDelete(item.id)}><Trash2 size={17} /></button></div></article>)}</div>;
+  if (!items.length)
+    return (
+      <div className="empty-state mt-10">
+        <FileText size={24} className="mx-auto" />
+        <p className="mt-3 font-semibold">Nothing here yet.</p>
+        <p className="mt-1 text-sm">Create the first item using the button above.</p>
+      </div>
+    );
+  return (
+    <div className="mt-10 grid gap-3">
+      {items.map((item: any) => (
+        <article key={item.id} className="admin-card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="badge badge-green">{item.status}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">{item.kind}</span>
+            </div>
+            <h2 className="font-display mt-2 truncate text-[23px] font-semibold">{item.title}</h2>
+            <p className="mt-1 text-xs text-ink/45">/{item.slug} · Updated {new Date(item.updatedAt).toLocaleDateString()}</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <button className="button button-outline" onClick={() => onEdit(item)}>
+              <Edit3 size={14} /> Edit
+            </button>
+            {item.status === "published" ? (
+              <button className="button button-outline" onClick={() => onStatus(item.id, "unpublished")}>
+                Unpublish
+              </button>
+            ) : item.status === "archived" ? (
+              <button className="button button-dark" onClick={() => onStatus(item.id, "draft")}>
+                <RefreshCw size={14} /> Restore draft
+              </button>
+            ) : (
+              <button className="button button-dark" onClick={() => onStatus(item.id, "published")}>
+                <Check size={14} /> Publish
+              </button>
+            )}
+            {item.status !== "archived" && (
+              <button className="button button-outline" onClick={() => onStatus(item.id, "archived")}>
+                Archive
+              </button>
+            )}
+            <button className="icon-button text-red-700" aria-label="Delete content" onClick={() => onDelete(item.id)}>
+              <Trash2 size={17} />
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
 }
 
 function MarkdownButton({ label, icon, onClick }: { label: string; icon: React.ReactNode; onClick: () => void }) {
-  return <button type="button" className="admin-icon-button" aria-label={label} title={label} onClick={onClick}>{icon}</button>;
+  return (
+    <button type="button" className="admin-icon-button" aria-label={label} title={label} onClick={onClick}>
+      {icon}
+    </button>
+  );
 }
 
 function Editor({
