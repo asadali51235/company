@@ -43,8 +43,8 @@ const navItems = [
   ["Tools", "/tools"],
 ];
 
-const articleCount = articles.filter(item => item.kind === "Article").length;
-const guideCount = articles.filter(item => item.kind === "Guide").length;
+const articleCount = articles.filter((item: ContentItem) => item.kind === "Article").length;
+const guideCount = articles.filter((item: ContentItem) => item.kind === "Guide").length;
 const toolCount = tools.length;
 
 type CmsPublicContent = {
@@ -76,8 +76,8 @@ function toContentItem(item: CmsPublicContent): ContentItem {
 function mergePublishedContent(items: ContentItem[], cmsItems?: CmsPublicContent[]) {
   if (!cmsItems) return items;
   const cms = cmsItems.map(toContentItem);
-  const cmsSlugs = new Set(cms.map(item => item.slug));
-  return [...cms, ...items.filter(item => !cmsSlugs.has(item.slug))];
+  const cmsSlugs = new Set(cms.map((item: ContentItem) => item.slug));
+  return [...cms, ...items.filter((item: ContentItem) => !cmsSlugs.has(item.slug))];
 }
 
 function usePageTitle(title: string) {
@@ -334,12 +334,12 @@ export default function Home() {
   const publishedContentQuery = trpc.content.list.useQuery({});
   const publishedContent = publishedContentQuery.data;
   const publicItems = mergePublishedContent(articles, publishedContent as CmsPublicContent[] | undefined);
-  const publicArticles = publicItems.filter(item => item.kind === "Article");
-  const publicJournal = publicItems.filter(item => item.kind === "Article" || item.kind === "Guide");
+  const publicArticles = publicItems.filter((item: ContentItem) => item.kind === "Article");
+  const publicJournal = publicItems.filter((item: ContentItem) => item.kind === "Article" || item.kind === "Guide");
   const articleCount = publishedContent
     ? publicArticles.length
-    : articles.filter(item => item.kind === "Article").length;
-  const guideCount = publicItems.filter(item => item.kind === "Guide").length;
+    : articles.filter((item: ContentItem) => item.kind === "Article").length;
+  const guideCount = publicItems.filter((item: ContentItem) => item.kind === "Guide").length;
   return (
     <PublicLayout>
       <main>
@@ -444,7 +444,7 @@ export default function Home() {
               href="/articles"
             />
             <div className="grid gap-5 md:grid-cols-3">
-              {publicJournal.slice(1, 4).map(item => (
+              {publicJournal.slice(1, 4).map((item: ContentItem) => (
                 <ContentCard key={item.slug} item={item} />
               ))}
             </div>
@@ -614,8 +614,8 @@ function ListingPage({
 }) {
   usePageTitle(title);
   const publishedContentQuery = trpc.content.list.useQuery({});
-  const allowedKinds = new Set(items.map(item => item.kind));
-  const visibleItems = mergePublishedContent(items, publishedContentQuery.data as CmsPublicContent[] | undefined).filter(item => allowedKinds.has(item.kind));
+  const allowedKinds = new Set(items.map((item: ContentItem) => item.kind));
+  const visibleItems = mergePublishedContent(items, publishedContentQuery.data as CmsPublicContent[] | undefined).filter((item: ContentItem) => allowedKinds.has(item.kind));
   return (
     <PublicLayout>
       <main className="container py-14 md:py-20">
@@ -627,7 +627,7 @@ function ListingPage({
           </p>
         </div>
         <div className="mt-14 grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-          {visibleItems.map(item => (
+          {visibleItems.map((item: ContentItem) => (
             <ContentCard item={item} key={item.slug} />
           ))}
         </div>
@@ -642,7 +642,7 @@ export function ArticlesPage() {
       eyebrow="The journal"
       title="Ideas for where you live next."
       description="Reporting, explainers and grounded opinions on buying, renting, investing and the forces shaping property markets."
-      items={articles.filter(item => item.kind === "Article")}
+      items={articles.filter((item: ContentItem) => item.kind === "Article")}
     />
   );
 }
@@ -652,7 +652,7 @@ export function GuidesPage() {
       eyebrow="Practical guides"
       title="The stuff they forget to tell you."
       description="Clear, step-by-step guides for the big property decisions—without the sales pitch."
-      items={articles.filter(item => item.kind === "Guide")}
+      items={articles.filter((item: ContentItem) => item.kind === "Guide")}
     />
   );
 }
@@ -808,7 +808,7 @@ export function ToolsPage() {
 
 export function ToolDetailPage() {
   const [, params] = useRoute("/tools/:slug");
-  const tool = tools.find(entry => entry.slug === params?.slug) ?? tools[0];
+  const tool = tools.find((entry: (typeof tools)[number]) => entry.slug === params?.slug) ?? tools[0];
   usePageTitle(tool.name);
   const formulaSettings = trpc.content.toolSettings.useQuery();
   const [values, setValues] = useState({
@@ -824,10 +824,10 @@ export function ToolDetailPage() {
     (event: React.ChangeEvent<HTMLInputElement>) =>
       setValues({ ...values, [key]: event.target.value });
   const settingValue = (toolSlug: string, key: string, fallback: string) =>
-    formulaSettings.data?.find(item => item.toolSlug === toolSlug && item.key === key)?.value ?? fallback;
+    formulaSettings.data?.find((item: any) => item.toolSlug === toolSlug && item.key === key)?.value ?? fallback;
   useEffect(() => {
     if (!formulaSettings.data) return;
-    setValues(current => ({
+    setValues((current: any) => ({
       ...current,
       rate: settingValue("mortgage-calculator", "default_interest_rate", "5.5"),
       term: settingValue("mortgage-calculator", "default_term_years", "25"),
@@ -1003,7 +1003,7 @@ export function SearchPage() {
               : `Showing all ${results.length} resources`}
           </p>
           <div className="mt-8 grid gap-5">
-            {results.map(item => (
+            {results.map((item: ContentItem) => (
               <ContentCard compact item={item} key={item.slug} />
             ))}
           </div>
@@ -1408,7 +1408,7 @@ function AdminWorkspace() {
                   </Link>
                 </div>
                 <div className="mt-6 grid gap-3">
-                  {articles.slice(0, 4).map(item => (
+                  {articles.slice(0, 4).map((item: ContentItem) => (
                     <div
                       key={item.slug}
                       className="flex items-center justify-between gap-4 border-t border-ink/10 py-4"
