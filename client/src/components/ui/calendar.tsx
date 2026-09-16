@@ -4,7 +4,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "lucide-react";
-import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
+import { DayPicker, getDefaultClassNames, type DayButton } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -27,15 +27,15 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "bg-background group/calendar p-5 rounded-2xl shadow-xl border border-border/50 [--cell-size:--spacing(10)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: date =>
-          date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (month: number) =>
+          new Date(2000, month).toLocaleDateString("default", { month: "short" }),
         ...formatters,
       }}
       classNames={{
@@ -98,17 +98,20 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          "relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
+          "relative size-(--cell-size) p-0 font-normal text-center text-sm rounded-full transition-all hover:bg-primary/10 data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground aspect-square select-none",
           defaultClassNames.day
         ),
         range_start: cn(
-          "rounded-l-md bg-accent",
+          "rounded-l-full bg-primary/20",
           defaultClassNames.range_start
         ),
-        range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
+        range_middle: cn("rounded-none bg-primary/10", defaultClassNames.range_middle),
+        range_end: cn(
+          "rounded-r-full bg-primary/20",
+          defaultClassNames.range_end
+        ),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+          "font-bold text-primary ring-2 ring-primary/30 rounded-full",
           defaultClassNames.today
         ),
         outside: cn(
@@ -123,11 +126,10 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
+        Root: ({ className, ...props }) => {
           return (
             <div
               data-slot="calendar"
-              ref={rootRef}
               className={cn(className)}
               {...props}
             />

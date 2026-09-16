@@ -7,7 +7,9 @@
     "css.d.ts",
     "server/**/*",
     "shared/**/*",
-    ".next-dev/types/**/*.ts"
+    ".next-dev/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    ".next-dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
@@ -26,13 +28,12 @@
       "dom",
       "dom.iterable"
     ],
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "types": [
       "node"
     ],
