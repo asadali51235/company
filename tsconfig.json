@@ -4,6 +4,7 @@
     "app/**/*",
     "client/src/**/*",
     "next-env.d.ts",
+    "css.d.ts",
     "server/**/*",
     "shared/**/*",
     ".next-dev/types/**/*.ts"
@@ -31,7 +32,7 @@
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "types": [
       "node"
     ],

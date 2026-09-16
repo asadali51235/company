@@ -35,8 +35,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
+      <body className="bg-background text-foreground antialiased">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-6">
+          {children}
+        </div>
         <JsonLd
           data={{
             "@context": "https://schema.org",

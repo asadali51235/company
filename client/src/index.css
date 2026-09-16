@@ -27,26 +27,26 @@
 }
 
 :root {
-  --background: #f7f3eb;
-  --foreground: #172522;
-  --card: #fffdf9;
-  --card-foreground: #172522;
-  --popover: #fffdf9;
-  --popover-foreground: #172522;
-  --primary: #17433f;
-  --primary-foreground: #f7f3eb;
-  --secondary: #e9e1d3;
-  --secondary-foreground: #172522;
-  --muted: #ede8df;
-  --muted-foreground: #6c736e;
-  --accent: #d8664d;
-  --accent-foreground: #fffdf9;
-  --border: rgba(23, 37, 34, .12);
-  --input: rgba(23, 37, 34, .14);
-  --ring: #d8664d;
-  --radius: .75rem;
-  --font-display: "DM Serif Display", Georgia, serif;
-  --font-body: "DM Sans", Arial, sans-serif;
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #0f172a;
+  --primary-foreground: #f8fafc;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #09090b;
+  --radius: 0.5rem;
+  --font-display: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
 }
 
 * { box-sizing: border-box; }
