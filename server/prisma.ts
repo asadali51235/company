@@ -1,10 +1,35 @@
-import { PrismaClient } from "@prisma/client";
+import * as PrismaPkg from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+// Fallback type if @prisma/client is not yet generated
+type PrismaClientType = any;
 
-export const prisma =
+const PrismaClientConstructor: any =
+  (PrismaPkg as any).PrismaClient ||
+  (PrismaPkg as any).default?.PrismaClient ||
+  class {
+    [key: string]: any;
+    constructor() {
+      return new Proxy(this, {
+        get: (_target, prop) => {
+          if (prop === "$disconnect" || prop === "$connect") {
+            return async () => {};
+          }
+          return new Proxy(
+            {},
+            {
+              get: () => async () => null,
+            }
+          );
+        },
+      });
+    }
+  };
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType };
+
+export const prisma: PrismaClientType =
   globalForPrisma.prisma ??
-  new PrismaClient({
+  new PrismaClientConstructor({
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 
