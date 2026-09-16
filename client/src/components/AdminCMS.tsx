@@ -143,20 +143,20 @@ export default function AdminCMS() {
       </div>
     );
 
-  const content = contentQuery.data ?? [];
+  const content: any[] = contentQuery.data ?? [];
   const currentSection =
-    sections.find(item => item.label === section) ?? sections[0];
+    sections.find((item: any) => item.label === section) ?? sections[0];
   const filtered = currentSection.kind
-    ? content.filter(item => item.kind === currentSection.kind)
+    ? content.filter((item: any) => item.kind === currentSection.kind)
     : content;
-  const visibleContent = filtered.filter(item => {
+  const visibleContent = filtered.filter((item: any) => {
     const matchesQuery = `${item.title} ${item.slug} ${item.excerpt ?? ""}`
       .toLowerCase()
       .includes(query.toLowerCase().trim());
     return matchesQuery && (statusFilter === "all" || item.status === statusFilter);
   });
-  const published = content.filter(item => item.status === "published").length;
-  const drafts = content.filter(item => item.status === "draft").length;
+  const published = content.filter((item: any) => item.status === "published").length;
+  const drafts = content.filter((item: any) => item.status === "draft").length;
   const saving = createMutation.isPending || updateMutation.isPending;
   const mutationError = createMutation.error?.message ?? updateMutation.error?.message;
 
@@ -165,7 +165,7 @@ export default function AdminCMS() {
     setEditor({ ...emptyEditor, kind });
   }
 
-  function openEdit(item: (typeof content)[number]) {
+  function openEdit(item: any) {
     setEditor({
       id: item.id,
       kind: item.kind,
@@ -376,7 +376,7 @@ function UtilityPanel({ section }: { section: string }) {
   const [seo, setSeo] = useState({ title: "", description: "" });
   useEffect(() => {
     const values = Object.fromEntries(
-      (settings.data ?? []).map(item => [item.key, item.value ?? ""])
+      (settings.data ?? []).map((item: any) => [item.key, item.value ?? ""])
     );
     setSeo({
       title: values.site_title ?? "",
@@ -432,7 +432,7 @@ function UtilityPanel({ section }: { section: string }) {
           </button>
         </form>
         <div className="grid gap-3">
-          {(categories.data ?? []).map(item => (
+          {(categories.data ?? []).map((item: any) => (
             <div
               className="admin-card flex items-center justify-between gap-4"
               key={item.id}
@@ -494,7 +494,7 @@ function UtilityPanel({ section }: { section: string }) {
           </button>
         </form>
         <div className="grid gap-3 md:grid-cols-2">
-          {(media.data ?? []).map(item => (
+          {(media.data ?? []).map((item: any) => (
             <div className="admin-card" key={item.id}>
               <img
                 src={item.url}
@@ -575,9 +575,9 @@ function ToolSettingsPanel() {
   const settings = trpc.admin.toolSettings.useQuery();
   const save = trpc.admin.saveToolSetting.useMutation({ onSuccess: () => void utils.admin.toolSettings.invalidate() });
   const [drafts, setDrafts] = useState<Record<number, string>>({});
-  const configured = new Map((settings.data ?? []).map(item => [`${item.toolSlug}:${item.key}`, item]));
-  const rows = [...toolFormulaDefaults.map(item => ({ ...item, saved: configured.get(`${item.toolSlug}:${item.key}`) })), ...(settings.data ?? []).filter(item => !toolFormulaDefaults.some(defaultItem => defaultItem.toolSlug === item.toolSlug && defaultItem.key === item.key)).map(item => ({ ...item, saved: item }))];
-  return <div className="mt-10 grid gap-5"><div className="admin-card"><p className="eyebrow">Calculator formulas</p><h2 className="font-display mt-2 text-[28px] font-semibold">Change assumptions without a code deploy.</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">These values are used by the public calculators. Save a value here when rates, periods or business rules change. Add a new key in the database later for another configurable assumption.</p></div>{rows.map(item => { const id = item.saved?.id ?? `${item.toolSlug}-${item.key}`; const value = drafts[item.saved?.id ?? 0] ?? item.saved?.value ?? item.value; return <div className="admin-card grid gap-3 md:grid-cols-[1fr_220px_auto] md:items-end" key={id}><div><p className="eyebrow">{item.toolSlug}</p><h2 className="font-display mt-1 text-xl font-semibold">{item.label}</h2><p className="mt-1 text-xs text-ink/50">{item.description || item.key}</p></div><input className="form-input" inputMode="decimal" value={value} onChange={event => setDrafts({ ...drafts, [item.saved?.id ?? 0]: event.target.value })} /><button className="button button-dark" onClick={() => save.mutate({ toolSlug: item.toolSlug, key: item.key, label: item.label, value, type: item.type, description: item.description ?? undefined })}><Check size={15} /> Save</button></div>; })}</div>;
+  const configured = new Map((settings.data ?? []).map((item: any) => [`${item.toolSlug}:${item.key}`, item]));
+  const rows = [...toolFormulaDefaults.map(item => ({ ...item, saved: configured.get(`${item.toolSlug}:${item.key}`) })), ...(settings.data ?? []).filter((item: any) => !toolFormulaDefaults.some(defaultItem => defaultItem.toolSlug === item.toolSlug && defaultItem.key === item.key)).map((item: any) => ({ ...item, saved: item }))];
+  return <div className="mt-10 grid gap-5"><div className="admin-card"><p className="eyebrow">Calculator formulas</p><h2 className="font-display mt-2 text-[28px] font-semibold">Change assumptions without a code deploy.</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">These values are used by the public calculators. Save a value here when rates, periods or business rules change. Add a new key in the database later for another configurable assumption.</p></div>{rows.map((item: any) => { const id = item.saved?.id ?? `${item.toolSlug}-${item.key}`; const value = drafts[item.saved?.id ?? 0] ?? item.saved?.value ?? item.value; return <div className="admin-card grid gap-3 md:grid-cols-[1fr_220px_auto] md:items-end" key={id}><div><p className="eyebrow">{item.toolSlug}</p><h2 className="font-display mt-1 text-xl font-semibold">{item.label}</h2><p className="mt-1 text-xs text-ink/50">{item.description || item.key}</p></div><input className="form-input" inputMode="decimal" value={value} onChange={event => setDrafts({ ...drafts, [item.saved?.id ?? 0]: event.target.value })} /><button className="button button-dark" onClick={() => save.mutate({ toolSlug: item.toolSlug, key: item.key, label: item.label, value, type: item.type, description: item.description ?? undefined })}><Check size={15} /> Save</button></div>; })}</div>;
 }
 
 function ReportsPanel() {
@@ -594,7 +594,7 @@ function MetricGroup({ label, values, loading }: { label: string; values?: { tot
 
 function ContentTable({ items, onEdit, onStatus, onDelete }: { items: any[]; onEdit: (item: any) => void; onStatus: (id: number, status: ContentStatus) => void; onDelete: (id: number) => void }) {
   if (!items.length) return <div className="empty-state mt-10"><FileText size={24} className="mx-auto" /><p className="mt-3 font-semibold">Nothing here yet.</p><p className="mt-1 text-sm">Create the first item using the button above.</p></div>;
-  return <div className="mt-10 grid gap-3">{items.map(item => <article key={item.id} className="admin-card flex flex-col gap-4 md:flex-row md:items-center md:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="badge badge-green">{item.status}</span><span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">{item.kind}</span></div><h2 className="font-display mt-2 truncate text-[23px] font-semibold">{item.title}</h2><p className="mt-1 text-xs text-ink/45">/{item.slug} · Updated {new Date(item.updatedAt).toLocaleDateString()}</p></div><div className="flex shrink-0 flex-wrap gap-2"><button className="button button-outline" onClick={() => onEdit(item)}><Edit3 size={14} /> Edit</button>{item.status === "published" ? <button className="button button-outline" onClick={() => onStatus(item.id, "unpublished")}>Unpublish</button> : item.status === "archived" ? <button className="button button-dark" onClick={() => onStatus(item.id, "draft")}><RefreshCw size={14} /> Restore draft</button> : <button className="button button-dark" onClick={() => onStatus(item.id, "published")}><Check size={14} /> Publish</button>}{item.status !== "archived" && <button className="button button-outline" onClick={() => onStatus(item.id, "archived")}>Archive</button>}<button className="icon-button text-red-700" aria-label="Delete content" onClick={() => onDelete(item.id)}><Trash2 size={17} /></button></div></article>)}</div>;
+  return <div className="mt-10 grid gap-3">{items.map((item: any) => <article key={item.id} className="admin-card flex flex-col gap-4 md:flex-row md:items-center md:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="badge badge-green">{item.status}</span><span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">{item.kind}</span></div><h2 className="font-display mt-2 truncate text-[23px] font-semibold">{item.title}</h2><p className="mt-1 text-xs text-ink/45">/{item.slug} · Updated {new Date(item.updatedAt).toLocaleDateString()}</p></div><div className="flex shrink-0 flex-wrap gap-2"><button className="button button-outline" onClick={() => onEdit(item)}><Edit3 size={14} /> Edit</button>{item.status === "published" ? <button className="button button-outline" onClick={() => onStatus(item.id, "unpublished")}>Unpublish</button> : item.status === "archived" ? <button className="button button-dark" onClick={() => onStatus(item.id, "draft")}><RefreshCw size={14} /> Restore draft</button> : <button className="button button-dark" onClick={() => onStatus(item.id, "published")}><Check size={14} /> Publish</button>}{item.status !== "archived" && <button className="button button-outline" onClick={() => onStatus(item.id, "archived")}>Archive</button>}<button className="icon-button text-red-700" aria-label="Delete content" onClick={() => onDelete(item.id)}><Trash2 size={17} /></button></div></article>)}</div>;
 }
 
 function MarkdownButton({ label, icon, onClick }: { label: string; icon: React.ReactNode; onClick: () => void }) {
@@ -820,7 +820,7 @@ function Editor({
                   className="form-input"
                 >
                   <option value="">Select saved media</option>
-                  {mediaQuery.data.map(item => (
+                  {mediaQuery.data.map((item: any) => (
                     <option key={item.id} value={item.url}>
                       {item.altText || item.url}
                     </option>
