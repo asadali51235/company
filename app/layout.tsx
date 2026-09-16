@@ -3,8 +3,19 @@ import type { Metadata } from "next";
 import { JsonLd } from "./json-ld";
 import { siteUrl } from "./site-config";
 
+// Safe URL fallback ensure karne ke liye helper
+const safeSiteUrl = siteUrl && siteUrl.trim() !== "" ? siteUrl : "http://localhost:3000";
+
+function getValidMetadataBase(): URL {
+  try {
+    return new URL(safeSiteUrl);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: getValidMetadataBase(),
   title: {
     default: "Estate Insights | Property research, guides and tools",
     template: "%s | Estate Insights",
@@ -16,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Estate Insights",
     title: "Estate Insights | Property research, guides and tools",
     description: "Independent real-estate research, practical guides, market reports and free property calculators.",
-    url: siteUrl,
+    url: safeSiteUrl, // <-- Yahan raw siteUrl ki jagah safeSiteUrl use karein
   },
   twitter: { card: "summary_large_image" },
 };
@@ -26,7 +37,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         {children}
-        <JsonLd data={{ "@context": "https://schema.org", "@type": "WebSite", name: "Estate Insights", url: siteUrl, potentialAction: { "@type": "SearchAction", target: `${siteUrl}/search?query={search_term_string}`, "query-input": "required name=search_term_string" } }} />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Estate Insights",
+            url: safeSiteUrl, // <-- Yahan bhi
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${safeSiteUrl}/search?query={search_term_string}`, // <-- Yahan bhi
+              "query-input": "required name=search_term_string",
+            },
+          }}
+        />
       </body>
     </html>
   );
