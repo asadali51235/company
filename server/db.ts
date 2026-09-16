@@ -1,7 +1,22 @@
-import { Prisma, type ContentStatus } from "@prisma/client";
 import { prisma } from "./prisma";
 
-export type InsertContentItem = Prisma.ContentItemCreateInput;
+export type ContentKind = "article" | "guide" | "report" | "area" | "tool";
+export type ContentStatus = "draft" | "published" | "unpublished" | "archived";
+
+export type InsertContentItem = {
+  kind: ContentKind;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  status?: ContentStatus;
+  featuredImage?: string;
+  imageAlt?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  categoryId?: number;
+};
 
 export async function listPublishedContent(query?: string) {
   return prisma.contentItem.findMany({
@@ -29,7 +44,7 @@ export async function listAdminContent() {
 }
 
 export async function createContent(input: {
-  kind: "article" | "guide" | "report" | "area" | "tool";
+  kind: ContentKind;
   title: string;
   slug: string;
   excerpt?: string;
@@ -90,7 +105,10 @@ export async function getAdminAnalytics() {
     prisma.contentItem.groupBy({ by: ["kind", "status"], _count: { _all: true } }),
     prisma.subscriber.count({ where: { status: "active" } }),
   ]);
-  const count = (kind: string, status?: string) => content.filter(item => item.kind === kind && (!status || item.status === status)).reduce((total, item) => total + item._count._all, 0);
+  const count = (kind: string, status?: string) =>
+    content
+      .filter((item: any) => item.kind === kind && (!status || item.status === status))
+      .reduce((total: number, item: any) => total + item._count._all, 0);
   return {
     subscribers,
     content: {
@@ -99,7 +117,11 @@ export async function getAdminAnalytics() {
       report: { total: count("report"), published: count("report", "published"), draft: count("report", "draft") },
       tool: { total: count("tool"), published: count("tool", "published"), draft: count("tool", "draft") },
     },
-    recent: await prisma.contentItem.findMany({ orderBy: { updatedAt: "desc" }, take: 6, select: { id: true, title: true, kind: true, status: true, updatedAt: true } }),
+    recent: await prisma.contentItem.findMany({
+      orderBy: { updatedAt: "desc" },
+      take: 6,
+      select: { id: true, title: true, kind: true, status: true, updatedAt: true },
+    }),
   };
 }
 
