@@ -1,6 +1,17 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import type { AdminUser } from "@prisma/client";
 import { authenticateRequest } from "../auth";
+
+export type AdminRole = "ADMIN" | "EDITOR";
+
+export type AdminUser = {
+  id: number;
+  email: string;
+  name: string | null;
+  passwordHash: string;
+  role: AdminRole;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -14,7 +25,7 @@ export async function createContext(
   let user: AdminUser | null = null;
 
   try {
-    user = await authenticateRequest(opts.req);
+    user = (await authenticateRequest(opts.req)) as AdminUser | null;
   } catch (error) {
     // Authentication is optional for public procedures.
     user = null;
